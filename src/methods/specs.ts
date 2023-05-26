@@ -1,6 +1,7 @@
 import { Request, Response } from "express";
 
 export default function specs(_: Request, res: Response) {
+  const baseUrl = process.env.BASE_URL;
   res.send({
     name: "service name",
     version: 1,
@@ -13,12 +14,11 @@ export default function specs(_: Request, res: Response) {
       },
     ],
     methods: {
-      fetch: "https://credit-api.salimon.io/apis/fetch",
-      transfer: "https://credit-api.salimon.io/apis/transfer",
-      transactions: "https://credit-api.salimon.io/apis/transactions",
-      acceptTransaction: "https://credit-api.salimon/io/apis/transactions/accept",
-      refuseTransaction: "https://credit-api.salimon/io/apis/transactions/refuse",
-      subLink: "https://credit-api.salimon/io/apis/socket",
+      fetch: baseUrl + "/fetch",
+      transfer: baseUrl + "/transfer",
+      transactions: baseUrl + "/transactions",
+      acceptTransaction: baseUrl + "/transactions/accept",
+      refuseTransaction: baseUrl + "/transactions/refuse",
     },
     token: {
       price: 0.001,

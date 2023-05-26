@@ -1,0 +1,34 @@
+name: Main
+on:
+  push:
+    branches: ["main"]
+  pull_request:
+    branches: ["main"]
+jobs:
+  main:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - name: setup nodejs
+        uses: actions/setup-node@v3
+        with:
+          node-version: 18
+
+      - name: install packages
+        run: npm ci
+
+      - name: update app.yaml file
+        run: echo "${{ secrets.APP_YML}}" > app.yaml
+
+      - name: build project
+        run: npm run build
+
+      - name: authenticate to google cloud
+        uses: "google-github-actions/auth@v1"
+        with:
+          credentials_json: "${{ secrets.GCLOUD }}"
+
+      - name: setup google cloud cli
+        uses: "google-github-actions/setup-gcloud@v1"
+      - name: deploy app
+        run: gcloud app deploy --quiet app.yaml
