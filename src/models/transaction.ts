@@ -2,8 +2,8 @@ import { Document, Schema, model } from "mongoose";
 
 export interface ITransaction {
   _id: string;
-  from: string;
-  to: string;
+  from: { name: string; _id: string };
+  to: { name: string; _id: string };
   amount: number;
   fee: number;
   status: "pending" | "excuted" | "declined";
@@ -11,9 +11,14 @@ export interface ITransaction {
   executedAt?: number;
 }
 
+const Reference = new Schema({
+  _id: { type: String, required: true },
+  name: { type: String, required: true },
+});
+
 const schema = new Schema<ITransaction>({
-  from: { type: String, required: true },
-  to: { type: String, required: true },
+  from: { type: Reference, required: true },
+  to: { type: Reference, required: true },
   amount: { type: Number, required: true },
   fee: { type: Number, required: true },
   status: { type: String, required: true },

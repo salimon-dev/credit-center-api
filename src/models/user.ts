@@ -5,13 +5,13 @@ export interface IUser {
   name: string;
   score: number;
   balance: number;
-  registerdAt: number;
+  registeredAt: number;
   secretToken: string;
 }
 
 const schema = new Schema<IUser>({
   name: { type: String, required: true },
-  registerdAt: { type: Number, required: true },
+  registeredAt: { type: Number, required: true },
 });
 
 export const UserModel = model("user", schema);

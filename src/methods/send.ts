@@ -5,14 +5,15 @@ import { TransactionModel } from "../models/transaction";
 import { UserModel } from "../models/user";
 
 const validationSchema = yup.object({
-  from: yup.string().required(),
   to: yup.string().required(),
   amount: yup.number().required(),
 });
 
 export default async function send(req: Request, res: Response) {
   try {
-    const { from, to, amount } = validationSchema.validateSync(req.body, { abortEarly: false });
+    const { to, amount } = validationSchema.validateSync(req.body, {
+      abortEarly: false,
+    });
     const fee = calculateFee(amount);
 
     const { authorization } = req.headers;
@@ -28,14 +29,12 @@ export default async function send(req: Request, res: Response) {
       return;
     }
 
-    if (user.name !== from) {
-      res.status(403).send({ ok: false, message: "permission denied" });
-      return;
-    }
-
-    const dstUser = await UserModel.findOne({ name: to });
+    const dstUser = await UserModel.findById(to);
     if (!dstUser) {
-      res.status(400).send({ ok: false, message: "transaction destination does not exists" });
+      res.status(400).send({
+        ok: false,
+        message: "transaction destination does not exists",
+      });
       return;
     }
     if (user.balance < amount + fee) {
@@ -43,7 +42,15 @@ export default async function send(req: Request, res: Response) {
       return;
     }
 
-    const transaction = await TransactionModel.create({ from, to, amount, fee, status: "exected", excutedAt: now(), createdAt: now() });
+    const transaction = await TransactionModel.create({
+      from: { _id: user._id, name: user.name },
+      to: { _id: dstUser._id, name: dstUser.name },
+      amount,
+      fee,
+      status: "exected",
+      excutedAt: now(),
+      createdAt: now(),
+    });
 
     user.balance -= amount + fee;
     await user.save();

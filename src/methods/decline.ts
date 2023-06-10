@@ -21,7 +21,7 @@ export default async function decline(req: Request, res: Response) {
     res.status(404).send({ ok: false, message: "transaction not found" });
     return;
   }
-  if (transaction.from !== user.name) {
+  if (transaction.from._id !== user._id) {
     res.status(403).send({ ok: false, message: "permission denied" });
     return;
   }

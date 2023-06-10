@@ -10,9 +10,18 @@ const validationSchema = yup.object({
 
 export default async function transactions(req: Request, res: Response) {
   try {
-    const { from, to, page, pageSize } = validationSchema.validateSync(req.query, { abortEarly: false });
-    const total = await TransactionModel.count({ from, to });
-    const records = await TransactionModel.find({ from, to })
+    const { from, to, page, pageSize } = validationSchema.validateSync(
+      req.query,
+      { abortEarly: false }
+    );
+    const total = await TransactionModel.count({
+      "from._id": from,
+      "to._id": to,
+    });
+    const records = await TransactionModel.find({
+      "from._id": from,
+      "to._id": to,
+    })
       .skip((page - 1) * pageSize)
       .limit(pageSize);
     res.send({

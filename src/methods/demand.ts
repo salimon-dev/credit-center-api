@@ -6,13 +6,14 @@ import { UserModel } from "../models/user";
 
 const validationSchema = yup.object({
   from: yup.string().required(),
-  to: yup.string().required(),
   amount: yup.number().required(),
 });
 
 export default async function demand(req: Request, res: Response) {
   try {
-    const { from, to, amount } = validationSchema.validateSync(req.body, { abortEarly: false });
+    const { from, amount } = validationSchema.validateSync(req.body, {
+      abortEarly: false,
+    });
     const fee = calculateFee(amount);
 
     const { authorization } = req.headers;
@@ -28,18 +29,22 @@ export default async function demand(req: Request, res: Response) {
       return;
     }
 
-    if (user.name !== to) {
-      res.status(403).send({ ok: false, message: "permission denied" });
-      return;
-    }
-
-    const srcUser = await UserModel.findOne({ name: from });
+    const srcUser = await UserModel.findById(from);
     if (!srcUser) {
-      res.status(400).send({ ok: false, message: "transaction source does not exists" });
+      res
+        .status(400)
+        .send({ ok: false, message: "transaction source does not exists" });
       return;
     }
 
-    const transaction = await TransactionModel.create({ from, to, amount, fee, status: "pending", createdAt: now() });
+    const transaction = await TransactionModel.create({
+      from: { _id: srcUser._id, name: srcUser.name },
+      to: { _id: user._id, name: user.name },
+      amount,
+      fee,
+      status: "pending",
+      createdAt: now(),
+    });
 
     res.send({ ok: true, transaction });
   } catch (e) {

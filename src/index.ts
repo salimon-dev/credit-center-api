@@ -18,13 +18,13 @@ const app = express();
 app.get("/", specs);
 
 app.post("/register", register);
-app.get("/fetch/name", fetch);
+app.get("/fetch/:name", fetch);
 
 app.get("/transactions", transaction);
 app.post("/demand", demand);
 app.post("/send", send);
-app.post("/execute", execute);
-app.post("/decline", decline);
+app.post("/execute/:id", execute);
+app.post("/decline/:id", decline);
 
 app.listen(port, () => {
   console.log("started credit center on port", port);

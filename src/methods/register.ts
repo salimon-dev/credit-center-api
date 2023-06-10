@@ -9,7 +9,7 @@ const validationSchema = yup.object({
 export default async function register(req: Request, res: Response) {
   try {
     const { name } = validationSchema.validateSync(req.body, { abortEarly: false });
-    const user = await UserModel.create({ name, score: 0, balance: 0, registerdAt: now() });
+    const user = await UserModel.create({ name, score: 0, balance: 0, registeredAt: now() });
     res.send({ ok: true, user });
   } catch (e) {
     const { errors } = e as yup.ValidationError;

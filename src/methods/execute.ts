@@ -21,13 +21,15 @@ export default async function execute(req: Request, res: Response) {
     res.status(404).send({ ok: false, message: "transaction not found" });
     return;
   }
-  if (transaction.from !== user.name) {
+  if (transaction.from._id !== user._id) {
     res.status(403).send({ ok: false, message: "permission denied" });
     return;
   }
   const dstUser = await UserModel.findOne({ name: transaction.to });
   if (!dstUser) {
-    res.status(400).send({ ok: false, message: "transaction destination does not exists" });
+    res
+      .status(400)
+      .send({ ok: false, message: "transaction destination does not exists" });
     return;
   }
   if (user.balance < transaction.amount + transaction.fee) {
