@@ -1,8 +1,13 @@
 import { Request, Response } from "express";
 import { UserModel } from "../models/user";
-
+import * as yup from "yup";
+const validationSchema = yup.object({
+  id: yup.string().required(),
+});
 export default async function fetch(req: Request, res: Response) {
-  const { name } = req.params as { name: string };
+  const { id } = validationSchema.validateSync(req.query, {
+    abortEarly: false,
+  });
   const user = await UserModel.findOne({ name });
   if (!user) {
     res.status(404).send({ ok: false, message: "user not found" });
