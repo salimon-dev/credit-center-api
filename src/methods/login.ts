@@ -1,27 +1,25 @@
 import { Request, Response } from "express";
 import * as yup from "yup";
 import { UserModel } from "../models/user";
-import { now } from "../utils";
 import { createHash } from "node:crypto";
-import { v4 as uuidV4 } from "uuid";
 const validationSchema = yup.object({
   name: yup.string().required().min(6).max(32),
+  secretToken: yup.string().required(),
 });
 
-export default async function register(req: Request, res: Response) {
+export default async function login(req: Request, res: Response) {
   try {
-    const { name } = validationSchema.validateSync(req.body, {
+    const { name, secretToken } = validationSchema.validateSync(req.body, {
       abortEarly: false,
     });
-    const secretToken = uuidV4() + "-" + uuidV4();
-    const user = await UserModel.create({
+    const user = await UserModel.findOne({
       name,
-      score: 0,
-      balance: 0,
       secretToken: createHash("md5").update(secretToken).digest("hex"),
-      secretDate: now(),
-      registeredAt: now(),
     });
+    if (!user) {
+      res.status(401).send({ ok: false, message: "unauthorized" });
+      return;
+    }
     res.send({
       ok: true,
       user: {
@@ -35,6 +33,7 @@ export default async function register(req: Request, res: Response) {
       },
     });
   } catch (e) {
+    console.log(e);
     const { errors } = e as yup.ValidationError;
     res.status(422).send({ ok: false, errors });
   }

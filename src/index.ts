@@ -1,5 +1,6 @@
 import express from "express";
 import dotenv from "dotenv";
+import cors from "cors";
 
 import specs from "./methods/specs";
 import transaction from "./methods/transactions";
@@ -11,14 +12,18 @@ import fetch from "./methods/fetch";
 import register from "./methods/register";
 import { connectToDB } from "./utils";
 import users from "./methods/users";
+import login from "./methods/login";
 
 dotenv.config();
 const port = process.env.PORT;
 const app = express();
+app.use(express.json());
+app.use(cors());
 
 app.get("/", specs);
 
 app.post("/register", register);
+app.post("/login", login);
 app.get("/fetch", fetch);
 
 app.get("/transactions", transaction);

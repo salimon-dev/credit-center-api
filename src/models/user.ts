@@ -7,11 +7,16 @@ export interface IUser {
   balance: number;
   registeredAt: number;
   secretToken: string;
+  secretDate: number;
 }
 
 const schema = new Schema<IUser>({
   name: { type: String, required: true },
+  score: { type: Number, required: true },
+  balance: { type: Number, required: true },
+  secretToken: { type: String, required: true },
   registeredAt: { type: Number, required: true },
+  secretDate: { type: Number, required: true },
 });
 
 export const UserModel = model("user", schema);
