@@ -13,6 +13,8 @@ import register from "./methods/register";
 import { connectToDB } from "./utils";
 import users from "./methods/users";
 import login from "./methods/login";
+import getFee from "./methods/getFee";
+import auth from "./middlewares/auth";
 
 dotenv.config();
 const port = process.env.PORT;
@@ -25,13 +27,14 @@ app.get("/", specs);
 app.post("/register", register);
 app.post("/login", login);
 app.get("/fetch", fetch);
+app.get("/fee", getFee);
 
 app.get("/transactions", transaction);
 app.get("/users", users);
-app.post("/demand", demand);
-app.post("/send", send);
-app.post("/execute", execute);
-app.post("/decline", decline);
+app.post("/demand", auth, demand);
+app.post("/send", auth, send);
+app.post("/execute", auth, execute);
+app.post("/decline", auth, decline);
 
 app.listen(port, () => {
   console.log("started credit center on port", port);

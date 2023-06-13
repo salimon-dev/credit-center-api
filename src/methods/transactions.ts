@@ -1,6 +1,7 @@
 import { Request, Response } from "express";
 import * as yup from "yup";
-import { TransactionModel } from "../models/transaction";
+import { ITransaction, TransactionModel } from "../models/transaction";
+import { FilterQuery } from "mongoose";
 const validationSchema = yup.object({
   from: yup.string().optional(),
   to: yup.string().optional(),
@@ -14,14 +15,15 @@ export default async function transactions(req: Request, res: Response) {
       req.query,
       { abortEarly: false }
     );
-    const total = await TransactionModel.count({
-      "from._id": from,
-      "to._id": to,
-    });
-    const records = await TransactionModel.find({
-      "from._id": from,
-      "to._id": to,
-    })
+    const query: FilterQuery<ITransaction> = {};
+    if (from) {
+      query["from._id"] = from;
+    }
+    if (to) {
+      query["to._id"] = to;
+    }
+    const total = await TransactionModel.count(query);
+    const records = await TransactionModel.find(query)
       .skip((page - 1) * pageSize)
       .limit(pageSize);
     res.send({

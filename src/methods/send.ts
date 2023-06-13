@@ -3,6 +3,7 @@ import * as yup from "yup";
 import { calculateFee, now } from "../utils";
 import { TransactionModel } from "../models/transaction";
 import { UserModel } from "../models/user";
+import { IAuthRequest } from "../middlewares/auth";
 
 const validationSchema = yup.object({
   to: yup.string().required(),
@@ -10,24 +11,12 @@ const validationSchema = yup.object({
 });
 
 export default async function send(req: Request, res: Response) {
+  const user = (req as IAuthRequest).user;
   try {
     const { to, amount } = validationSchema.validateSync(req.body, {
       abortEarly: false,
     });
     const fee = calculateFee(amount);
-
-    const { authorization } = req.headers;
-
-    if (!authorization) {
-      res.status(401).send({ ok: false, message: "unauthorized" });
-      return;
-    }
-    const token = authorization.replace("Bearer ", "");
-    const user = await UserModel.findOne({ secretToken: token });
-    if (!user) {
-      res.status(401).send({ ok: false, message: "unauthorized" });
-      return;
-    }
 
     const dstUser = await UserModel.findById(to);
     if (!dstUser) {
@@ -48,7 +37,7 @@ export default async function send(req: Request, res: Response) {
       amount,
       fee,
       status: "exected",
-      excutedAt: now(),
+      executedAt: now(),
       createdAt: now(),
     });
 

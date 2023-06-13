@@ -5,7 +5,7 @@ export function now() {
 }
 
 export function calculateFee(amount: number) {
-  return amount * 0.01;
+  return Math.ceil(amount * 0.01);
 }
 
 export async function connectToDB() {
