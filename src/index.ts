@@ -33,8 +33,8 @@ app.get("/transactions", transaction);
 app.get("/users", users);
 app.post("/demand", auth, demand);
 app.post("/send", auth, send);
-app.post("/execute", auth, execute);
-app.post("/decline", auth, decline);
+app.get("/execute", auth, execute);
+app.get("/decline", auth, decline);
 
 app.listen(port, () => {
   console.log("started credit center on port", port);

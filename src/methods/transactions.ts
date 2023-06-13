@@ -5,13 +5,14 @@ import { FilterQuery } from "mongoose";
 const validationSchema = yup.object({
   from: yup.string().optional(),
   to: yup.string().optional(),
+  address: yup.string().optional(),
   page: yup.number().optional().default(1),
   pageSize: yup.number().optional().default(25),
 });
 
 export default async function transactions(req: Request, res: Response) {
   try {
-    const { from, to, page, pageSize } = validationSchema.validateSync(
+    const { from, to, address, page, pageSize } = validationSchema.validateSync(
       req.query,
       { abortEarly: false }
     );
@@ -21,6 +22,9 @@ export default async function transactions(req: Request, res: Response) {
     }
     if (to) {
       query["to._id"] = to;
+    }
+    if (address) {
+      query["$or"] = [{ "from._id": address }, { "to._id": address }];
     }
     const total = await TransactionModel.count(query);
     const records = await TransactionModel.find(query)
@@ -35,6 +39,7 @@ export default async function transactions(req: Request, res: Response) {
           to: item.to,
           amount: item.amount,
           fee: item.fee,
+          status: item.status,
           createdAt: item.createdAt,
           executedAt: item.executedAt,
           details: "https://credit.salimon.io/transaction/" + item._id,

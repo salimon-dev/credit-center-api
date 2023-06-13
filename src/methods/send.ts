@@ -36,7 +36,7 @@ export default async function send(req: Request, res: Response) {
       to: { _id: dstUser._id, name: dstUser.name },
       amount,
       fee,
-      status: "exected",
+      status: "executed",
       executedAt: now(),
       createdAt: now(),
     });

@@ -6,7 +6,7 @@ export interface ITransaction {
   to: { name: string; _id: string };
   amount: number;
   fee: number;
-  status: "pending" | "excuted" | "declined";
+  status: "pending" | "executed" | "declined";
   createdAt: number;
   executedAt?: number;
 }
