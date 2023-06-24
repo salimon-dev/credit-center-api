@@ -1,20 +1,16 @@
 import { Document, Schema, model } from "mongoose";
+import { IReference, Reference } from "./common";
 
 export interface ITransaction {
   _id: string;
-  from: { name: string; _id: string };
-  to: { name: string; _id: string };
+  from: IReference;
+  to: IReference;
   amount: number;
   fee: number;
   status: "pending" | "executed" | "declined";
   createdAt: number;
   executedAt?: number;
 }
-
-const Reference = new Schema({
-  _id: { type: String, required: true },
-  name: { type: String, required: true },
-});
 
 const schema = new Schema<ITransaction>({
   from: { type: Reference, required: true },

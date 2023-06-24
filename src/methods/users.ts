@@ -1,6 +1,5 @@
 import { Request, Response } from "express";
 import * as yup from "yup";
-import { TransactionModel } from "../models/transaction";
 import { FilterQuery } from "mongoose";
 import { IUser, UserModel } from "../models/user";
 const validationSchema = yup.object({

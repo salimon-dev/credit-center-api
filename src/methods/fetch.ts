@@ -2,14 +2,14 @@ import { Request, Response } from "express";
 import { UserModel } from "../models/user";
 import * as yup from "yup";
 const validationSchema = yup.object({
-  id: yup.string().required(),
+  name: yup.string().required(),
 });
 export default async function fetch(req: Request, res: Response) {
   try {
-    const { id } = validationSchema.validateSync(req.query, {
+    const { name } = validationSchema.validateSync(req.query, {
       abortEarly: false,
     });
-    const user = await UserModel.findById(id);
+    const user = await UserModel.findOne({ name });
     if (!user) {
       res.status(404).send({ ok: false, message: "user not found" });
       return;
@@ -20,7 +20,6 @@ export default async function fetch(req: Request, res: Response) {
         _id: user._id,
         name: user.name,
         score: user.score,
-        balance: user.balance,
         registeredAt: user.registeredAt,
       },
     });

@@ -1,7 +1,6 @@
 import { Request, Response } from "express";
-import { UserModel } from "../models/user";
 import * as yup from "yup";
-import { calculateFee } from "../utils";
+import { calculateFee } from "../../utils";
 const validationSchema = yup.object({
   amount: yup.number().required().positive(),
 });

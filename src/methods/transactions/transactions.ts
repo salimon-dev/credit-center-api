@@ -1,7 +1,8 @@
 import { Request, Response } from "express";
 import * as yup from "yup";
-import { ITransaction, TransactionModel } from "../models/transaction";
+import { ITransaction, TransactionModel } from "../../models/transaction";
 import { FilterQuery } from "mongoose";
+import { IAuthRequest } from "../../middlewares/auth";
 const validationSchema = yup.object({
   from: yup.string().optional(),
   to: yup.string().optional(),
@@ -11,21 +12,23 @@ const validationSchema = yup.object({
 });
 
 export default async function transactions(req: Request, res: Response) {
+  const { user } = req as IAuthRequest;
   try {
-    const { from, to, address, page, pageSize } = validationSchema.validateSync(
+    const { from, to, page, pageSize } = validationSchema.validateSync(
       req.query,
       { abortEarly: false }
     );
-    const query: FilterQuery<ITransaction> = {};
+    const query: FilterQuery<ITransaction> = {
+      $or: [{ "from._id": user._id }, { "to._id": user._id }],
+    };
+
     if (from) {
       query["from._id"] = from;
     }
     if (to) {
       query["to._id"] = to;
     }
-    if (address) {
-      query["$or"] = [{ "from._id": address }, { "to._id": address }];
-    }
+
     const total = await TransactionModel.count(query);
     const records = await TransactionModel.find(query)
       .skip((page - 1) * pageSize)

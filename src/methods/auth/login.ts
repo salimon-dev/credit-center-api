@@ -1,9 +1,9 @@
 import { Request, Response } from "express";
 import * as yup from "yup";
-import { UserModel } from "../models/user";
+import { UserModel } from "../../models/user";
 import { createHash } from "node:crypto";
 const validationSchema = yup.object({
-  name: yup.string().required().min(6).max(32),
+  name: yup.string().required(),
   secretToken: yup.string().required(),
 });
 

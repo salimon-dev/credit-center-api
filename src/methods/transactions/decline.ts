@@ -1,8 +1,7 @@
 import { Request, Response } from "express";
-import { TransactionModel } from "../models/transaction";
-import { UserModel } from "../models/user";
+import { TransactionModel } from "../../models/transaction";
 import * as yup from "yup";
-import { IAuthRequest } from "../middlewares/auth";
+import { IAuthRequest } from "../../middlewares/auth";
 
 const validationSchema = yup.object({
   id: yup.string().required(),
@@ -10,7 +9,7 @@ const validationSchema = yup.object({
 export default async function decline(req: Request, res: Response) {
   const user = (req as IAuthRequest).user;
   try {
-    const { id } = validationSchema.validateSync(req.query, {
+    const { id } = validationSchema.validateSync(req.body, {
       abortEarly: false,
     });
     const transaction = await TransactionModel.findById(id);

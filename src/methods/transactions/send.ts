@@ -1,24 +1,24 @@
 import { Request, Response } from "express";
 import * as yup from "yup";
-import { calculateFee, now } from "../utils";
-import { TransactionModel } from "../models/transaction";
-import { UserModel } from "../models/user";
-import { IAuthRequest } from "../middlewares/auth";
+import { calculateFee, now } from "../../utils";
+import { TransactionModel } from "../../models/transaction";
+import { UserModel } from "../../models/user";
+import { IAuthRequest } from "../../middlewares/auth";
 
 const validationSchema = yup.object({
-  to: yup.string().required(),
+  name: yup.string().required(),
   amount: yup.number().required(),
 });
 
 export default async function send(req: Request, res: Response) {
   const user = (req as IAuthRequest).user;
   try {
-    const { to, amount } = validationSchema.validateSync(req.body, {
+    const { name, amount } = validationSchema.validateSync(req.body, {
       abortEarly: false,
     });
     const fee = calculateFee(amount);
 
-    const dstUser = await UserModel.findById(to);
+    const dstUser = await UserModel.findOne({ name });
     if (!dstUser) {
       res.status(400).send({
         ok: false,

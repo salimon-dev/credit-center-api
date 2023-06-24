@@ -1,11 +1,18 @@
 import { Request, Response } from "express";
 import * as yup from "yup";
-import { UserModel } from "../models/user";
-import { now } from "../utils";
+import { UserModel } from "../../models/user";
+import { now } from "../../utils";
 import { createHash } from "node:crypto";
 import { v4 as uuidV4 } from "uuid";
 const validationSchema = yup.object({
-  name: yup.string().required().min(6).max(32),
+  name: yup
+    .string()
+    .required()
+    .min(6)
+    .max(32)
+    .matches(/^[a-z0-9]+$/g, {
+      message: "name only can containe lowercase chars and number",
+    }),
 });
 
 export default async function register(req: Request, res: Response) {
@@ -14,6 +21,18 @@ export default async function register(req: Request, res: Response) {
       abortEarly: false,
     });
     const secretToken = uuidV4() + "-" + uuidV4();
+    if ((await UserModel.findOne({ name })) !== null) {
+      res.status(422).send({
+        ok: false,
+        errors: [
+          {
+            field: "name",
+            message: "your account name must be unique",
+          },
+        ],
+      });
+      return;
+    }
     const user = await UserModel.create({
       name,
       score: 0,
