@@ -4,6 +4,7 @@ import cors from "cors";
 
 import specs from "./methods/specs";
 import transactions from "./methods/transactions/routes";
+import sessions from "./methods/sessions/routes";
 import auth from "./methods/auth/routes";
 import { connectToDB } from "./utils";
 import fetch from "./methods/fetch";
@@ -16,6 +17,7 @@ app.use(cors());
 
 app.get("/", specs);
 app.use("/transactions", transactions);
+app.use("/sessions", sessions);
 app.use("/auth", auth);
 app.use("/fetch", fetch);
 
