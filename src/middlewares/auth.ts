@@ -1,6 +1,6 @@
 import { NextFunction, Request, Response } from "express";
-import { createHash } from "node:crypto";
 import { UserDocument, UserModel } from "../models/user";
+import { verifyJWT } from "../utils";
 
 export interface IAuthRequest extends Request {
   user: UserDocument;
@@ -16,9 +16,8 @@ export default async function auth(
     return;
   }
   const token = authorization.replace("Bearer ", "");
-  const user = await UserModel.findOne({
-    secretToken: createHash("md5").update(token).digest("hex"),
-  });
+  const id = verifyJWT(token);
+  const user = await UserModel.findById(id);
   if (!user) {
     res.status(401).send({ ok: false, message: "unauthorized" });
     return;

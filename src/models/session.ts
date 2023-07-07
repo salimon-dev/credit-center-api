@@ -3,21 +3,19 @@ import { IReference, Reference } from "./common";
 
 export interface ISession {
   _id: string;
-  hostUser: IReference;
-  targetUser: IReference;
-  token: string;
+  service: IReference;
+  user: IReference;
   status: string;
-  description: string;
   createdAt: number;
+  updatedAt: number;
 }
 
 const schema = new Schema<ISession>({
-  hostUser: { type: String, required: true },
-  description: { type: String, required: true },
-  token: { type: String, required: true },
+  service: { type: Reference, required: true },
+  user: { type: Reference, required: true },
   status: { type: String, required: true },
-  targetUser: { type: Reference, required: true },
   createdAt: { type: Number, required: true },
+  updatedAt: { type: Number, required: true },
 });
 
 export const SessionModel = model("session", schema);

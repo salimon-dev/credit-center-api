@@ -26,14 +26,7 @@ export default async function verify(req: Request, res: Response) {
     await session.save();
     res.send({
       ok: true,
-      session: {
-        _id: session._id,
-        hostUser: session.hostUser,
-        targetUser: session.targetUser,
-        status: session.status,
-        description: session.description,
-        createdAt: session.createdAt,
-      },
+      session,
     });
   } catch (e) {
     const { errors } = e as yup.ValidationError;

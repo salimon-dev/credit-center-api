@@ -1,6 +1,5 @@
 import { Request, Response } from "express";
 import * as yup from "yup";
-import { ITransaction, TransactionModel } from "../../models/transaction";
 import { FilterQuery } from "mongoose";
 import { IAuthRequest } from "../../middlewares/auth";
 import { ISession, SessionModel } from "../../models/session";
@@ -37,28 +36,7 @@ export default async function sessions(req: Request, res: Response) {
       .limit(pageSize);
     res.send({
       ok: true,
-      data: records.map((item) => {
-        if (item.targetUser._id === user._id) {
-          return {
-            _id: item._id,
-            hostUser: item.hostUser,
-            targetUser: item.targetUser,
-            status: item.status,
-            token: item.token,
-            description: item.description,
-            createdAt: item.createdAt,
-          };
-        } else {
-          return {
-            _id: item._id,
-            hostUser: item.hostUser,
-            targetUser: item.targetUser,
-            status: item.status,
-            description: item.description,
-            createdAt: item.createdAt,
-          };
-        }
-      }),
+      data: records,
       meta: {
         total,
         page,

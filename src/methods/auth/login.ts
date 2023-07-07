@@ -2,24 +2,30 @@ import { Request, Response } from "express";
 import * as yup from "yup";
 import { UserModel } from "../../models/user";
 import { createHash } from "node:crypto";
+import { generateJWT, md5, now } from "../../utils";
 const validationSchema = yup.object({
   name: yup.string().required(),
-  secretToken: yup.string().required(),
+  password: yup.string().required(),
 });
 
 export default async function login(req: Request, res: Response) {
   try {
-    const { name, secretToken } = validationSchema.validateSync(req.body, {
+    const { name, password } = validationSchema.validateSync(req.body, {
       abortEarly: false,
     });
     const user = await UserModel.findOne({
       name,
-      secretToken: createHash("md5").update(secretToken).digest("hex"),
+      password: md5(password),
     });
     if (!user) {
       res.status(401).send({ ok: false, message: "unauthorized" });
       return;
     }
+
+    const accessToken = generateJWT(
+      user._id.toString(),
+      parseInt(process.env["TOKEN_AGE"] || "3600")
+    );
     res.send({
       ok: true,
       user: {
@@ -27,10 +33,11 @@ export default async function login(req: Request, res: Response) {
         name: user.name,
         score: user.score,
         balance: user.balance,
-        secretToken,
         secretDate: user.secretDate,
         registeredAt: user.registeredAt,
       },
+      accessToken,
+      expiresAt: now() + parseInt(process.env["TOKEN_AGE"] || "3600"),
     });
   } catch (e) {
     console.log(e);
